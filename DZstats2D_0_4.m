@@ -76,7 +76,10 @@ build_Callback(hObject, eventdata, H)
 
 function build_Callback(hObject, eventdata, H)
 
-f = waitbar(0, 'Calculating densities! Please wait...');
+%f = waitbar(0, 'Calculating densities! Please wait...');
+fig = uifigure;
+set(fig, 'Position', [800         500         400         75])
+d = uiprogressdlg(fig,'Message','Calculating densities! Please wait...');
 
 numbers = H.numbers;
 data_tmp = H.data_tmp;
@@ -137,7 +140,8 @@ for k = 1:N
 	CDF1_Q3(:,:,k) = cumsum(cumsum(density1(:,:,k), 1,'reverse'), 2, 'reverse'); %Local CDF for Quadrant 3
 	CDF1_Q4(:,:,k) = cumsum(cumsum(density1(:,:,k), 1), 2, 'reverse');           %Loval CDF for Quadrant 4
 	clear data2
-	waitbar(k/N, f, 'Calculating densities! Please wait...');
+	d.Value = k/N;
+	d.Message = 'Calculating densities! Please wait...';
 end
 %2D quantitative comparison
 count = 1;
@@ -193,7 +197,7 @@ H.X1 = X1;
 H.Y1 = Y1;
 H.data1 = data1;
 
-close(f)
+close(fig)
 
 guidata(hObject,H);
 plot_Callback(hObject, eventdata, H)
@@ -208,6 +212,8 @@ Name = H.Name;
 N = H.N;
 X1 = H.X1;
 Y1 = H.Y1;
+
+
 
 if H.export_plot == 0 && H.save_plot == 0
 	%clear uipanels with 2D density plots, if they exist
@@ -238,7 +244,7 @@ axoffyz = ones(N,1); %variable to turn off some y and z axes for 2D plots
 for i = 1:rc
 	pos(1+max(rc)*(i-1):max(rc)*i,1) = [0.075:0.9/rc:0.90]; % left position of plots
 	if 	1+max(rc)*(i-1) <= i < max(rc)*i
-		pos(1+max(rc)*(i-1):max(rc)*i,2) = 0.055 + (rc-i)/rc*0.97; % bottom position of plots
+		pos(1+max(rc)*(i-1):max(rc)*i,2) = 0.055 + (rc-i)/rc*0.95; % bottom position of plots
 	end
 	if 	2+max(rc)*(i-1) <= i <= max(rc)*i || i < max(rc)*max(rc) - (max(rc)-1) 
 		axoffx(1+max(rc)*(i-1):max(rc)*i,1) = 1; %turn off x axes in between plots for 2D plotting
@@ -447,10 +453,13 @@ if get(H.colormap,'Value') > 20
 	colormap(cmap)
 end
 
-
+fig = uifigure;
+set(fig, 'Position', [800         500         400         75])
+d = uiprogressdlg(fig,'Message','Making plots! Please wait...');
 
 % Main plots
 for i = 1:N
+	
 	if H.export_plot == 0 && H.save_plot == 0
 		ax(i) = axes(H.axes1, 'Position', pos(i,:));
 	end
@@ -485,7 +494,7 @@ for i = 1:N
 			ylabel(get(H.y_lab,'String'))
 			zlabel(get(H.z_lab,'String'))
 		end
-		title(Name(i,1))
+		title(Name(i,1), 'Interpreter', 'none')
 		axis([str2double(get(H.xmin,'String')),str2double(get(H.xmax,'String')),str2double(get(H.ymin,'String')),str2double(get(H.ymax,'String'))]);
 		view(2)
 	end
@@ -497,7 +506,7 @@ for i = 1:N
 			ylabel(get(H.y_lab,'String'))
 			zlabel(get(H.z_lab,'String'))
 		end
-		title(Name(i,1))
+		title(Name(i,1), 'Interpreter', 'none')
 		view(3)
 	end
 	if get(H.gridon,'Value') == 1
@@ -552,7 +561,12 @@ for i = 1:N
 			clear max_density max_density
 		end
 	end
+	
+	d.Value = i/N;
+	d.Message = 'Making plots! Please wait...';
+	
 end
+
 
 if get(H.syncax,'Value') == 1 %option to synchronize axes
 	Link = linkprop(ax,{'CameraUpVector', 'CameraPosition', 'CameraTarget', 'XLim', 'YLim', 'ZLim'});
@@ -575,6 +589,7 @@ if H.save_plot == 1
 end
 H.export_plot = 0;
 H.save_plot = 0;
+close(fig)
 guidata(hObject,H);
 
 function RunAllSave_Callback(hObject, eventdata, H)
@@ -842,7 +857,7 @@ set(H.setbandwidth,'Value',1);
 set(H.optimized,'Value',0);
 set(H.printkern,'Enable','off')
 if H.dataloaded == 1;
-	plot_Callback(hObject, eventdata, H)
+	build_Callback(hObject, eventdata, H)
 end
 
 function setY_Callback(hObject, eventdata, H)
@@ -850,7 +865,7 @@ set(H.setbandwidth,'Value',1);
 set(H.optimized,'Value',0);
 set(H.printkern,'Enable','off')
 if H.dataloaded == 1;
-	plot_Callback(hObject, eventdata, H)
+	build_Callback(hObject, eventdata, H)
 end
 
 function optimized_Callback(hObject, eventdata, H)
@@ -987,7 +1002,7 @@ if H.dataloaded == 1;
 		X=XY(:,1);
 		Y=XY(:,2);
 		dx=0.01;
-		f = figure('Name','2D Multidimensional Scaling Bivariate Cross-correlation Values','NumberTitle','off', 'MenuBar', 'none');
+		f = figure('Name','2D Multidimensional Scaling Bivariate Cross-correlation Values','NumberTitle','off');
 		hold on
 		for i=1:H.N
 			scatter(X(i),Y(i),250, 'o', 'MarkerFaceColor',colors(i, :),'MarkerEdgeColor','black');
@@ -995,7 +1010,7 @@ if H.dataloaded == 1;
 		[rubbish,i] = sort(H.R2D,1,'descend');
 		YX=XY(i(2,:),:);
 		YZ=XY(i(3,:),:);
-		text(X+dx,Y+dx,H.Name, 'FontSize',16);
+		text(X+dx,Y+dx,H.Name, 'FontSize',16, 'Interpreter', 'none');
 		set(gca,'FontSize',16)
 		%title('Cross-correlation')
 		xlabel('Dimension I')
@@ -1007,7 +1022,7 @@ if H.dataloaded == 1;
 		X=XY(:,1);
 		Y=XY(:,2);
 		dx=0.01;
-		f = figure('Name','2D Multidimensional Scaling of Likeness Values','NumberTitle','off', 'MenuBar', 'none');
+		f = figure('Name','2D Multidimensional Scaling of Likeness Values','NumberTitle','off');
 		hold on
 		for i=1:H.N
 			scatter(X(i),Y(i),250, 'o', 'MarkerFaceColor',colors(i, :),'MarkerEdgeColor','black');
@@ -1015,7 +1030,7 @@ if H.dataloaded == 1;
 		[rubbish,i] = sort(H.L2D,1,'descend');
 		YX=XY(i(2,:),:);
 		YZ=XY(i(3,:),:);
-		text(X+dx,Y+dx,H.Name, 'FontSize',16);
+		text(X+dx,Y+dx,H.Name, 'FontSize',16, 'Interpreter', 'none');
 		set(gca,'FontSize',16)
 		%title('Likeness')
 		xlabel('Dimension I')
@@ -1027,7 +1042,7 @@ if H.dataloaded == 1;
 		X=XY(:,1);
 		Y=XY(:,2);
 		dx=0.01;
-		f = figure('Name','2D Multidimensional Scaling of Bivariate Similarity Values','NumberTitle','off', 'MenuBar', 'none');
+		f = figure('Name','2D Multidimensional Scaling of Bivariate Similarity Values','NumberTitle','off');
 		hold on
 		for i=1:H.N
 			scatter(X(i),Y(i),250, 'o', 'MarkerFaceColor',colors(i, :),'MarkerEdgeColor','black');
@@ -1035,7 +1050,7 @@ if H.dataloaded == 1;
 		[rubbish,i] = sort(H.S2D,1,'descend');
 		YX=XY(i(2,:),:);
 		YZ=XY(i(3,:),:);
-		text(X+dx,Y+dx,H.Name, 'FontSize',16);
+		text(X+dx,Y+dx,H.Name, 'FontSize',16, 'Interpreter', 'none');
 		set(gca,'FontSize',16)
 		%title('Similarity')
 		xlabel('Dimension I')
@@ -1047,7 +1062,7 @@ if H.dataloaded == 1;
 		X=XY(:,1);
 		Y=XY(:,2);
 		dx=0.01;
-		f = figure('Name','2D Multidimensional Scaling of Bivariate K-S Test D Values','NumberTitle','off', 'MenuBar', 'none');
+		f = figure('Name','2D Multidimensional Scaling of Bivariate K-S Test D Values','NumberTitle','off');
 		hold on
 		for i=1:H.N
 			scatter(X(i),Y(i),250, 'o', 'MarkerFaceColor',colors(i, :),'MarkerEdgeColor','black');
@@ -1055,7 +1070,7 @@ if H.dataloaded == 1;
 		[rubbish,i] = sort(H.D2D,1,'descend');
 		YX=XY(i(2,:),:);
 		YZ=XY(i(3,:),:);
-		text(X+dx,Y+dx,H.Name, 'FontSize',16);
+		text(X+dx,Y+dx,H.Name, 'FontSize',16, 'Interpreter', 'none');
 		set(gca,'FontSize',16)
 		%title('K-S Test D Values')
 		xlabel('Dimension I')
@@ -1067,7 +1082,7 @@ if H.dataloaded == 1;
 		X=XY(:,1);
 		Y=XY(:,2);
 		dx=0.01;
-		f = figure('Name','2D Multidimensional Scaling of Kuiper Test V Values','NumberTitle','off', 'MenuBar', 'none');
+		f = figure('Name','2D Multidimensional Scaling of Kuiper Test V Values','NumberTitle','off');
 		hold on
 		for i=1:H.N
 			scatter(X(i),Y(i),250, 'o', 'MarkerFaceColor',colors(i, :),'MarkerEdgeColor','black');
@@ -1075,12 +1090,13 @@ if H.dataloaded == 1;
 		[rubbish,i] = sort(H.V2D,1,'descend');
 		YX=XY(i(2,:),:);
 		YZ=XY(i(3,:),:);
-		text(X+dx,Y+dx,H.Name, 'FontSize',16);
+		text(X+dx,Y+dx,H.Name, 'FontSize',16, 'Interpreter', 'none');
 		set(gca,'FontSize',16)
 		%title('Kuiper Test V Values')
 		xlabel('Dimension I')
 		ylabel('Dimension II')
 	end
+	addToolbarExplorationButtons(f)
 end
 
 function MC_Callback(hObject, eventdata, H)
@@ -1877,6 +1893,7 @@ R2D_mod(R2D == 1) = NaN;
 R2D_min = min(min(R2D_mod,[],'omitnan'));
 R2D_max = max(max(R2D_mod,[],'omitnan'));
 R2D_int = [R2D_min:(R2D_max-R2D_min)/10:R2D_max]';
+
 for i = 1:N
 	for j = 1:N
 		if i == j
