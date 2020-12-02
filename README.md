@@ -2,13 +2,11 @@
 
 Two-dimensional quantitative comparison measures for bivariate data. Measures are extensions of one-dimensional counterparts commonly used in detrital geochronology and summarized in Saylor and Sundell (2016), Geosphere. The measures implememented in DZstats2D are described in Sundell and Saylor (submitted) to Geochemistry, Geophysics, Geosystems.
 
-## Sundell and Saylor (submitted)
-
-## Sundell, K.E. and Saylor, J.E., 2017. Two-dimensional quantitative comparison in detrital geochronology and geochemistry. Geochemistry, Geophysics, Geosystems.
+## Sundell, K.E. and Saylor, J.E., (submitted). Two-dimensional quantitative comparison in detrital geochronology and geochemistry. Geochemistry, Geophysics, Geosystems.
 
 ### Run in MATLAB
 
-To run DZstats2D in MATLAB open the DZstats2D.m file and run it.
+To run DZstats2D in MATLAB open the DZstats2D.m file and run it. This code runs best in MATLAB 2018b. 
 
 ### Run without MATLAB
 
