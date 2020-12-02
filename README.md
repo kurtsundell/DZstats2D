@@ -27,3 +27,5 @@ http://ssd.mathworks.com/supportfiles/downloads/R2018b/deployment_files/R2018b/i
 Latest release, example data, information, and publication can be found here: 
 
 https://github.com/kurtsundell/DZstats2D/releases
+
+USER MANUAL can be found here: https://github.com/kurtsundell/DZstats2D/releases/download/DZstats2D-0.04/DZstats2D-0.04_User_Manual.pdf
