@@ -5,10 +5,10 @@ clc
 
 rng('default')
 
-%[filename pathname] = uigetfile({'*'},'File Selector'); %load the supplemental file with zircon age eHfT data
-
+[filename pathname] = uigetfile({'*'},'File Selector'); %load the supplemental file with zircon age eHfT data
+[numbers text1, data] = xlsread([pathname filename])
 % Read in data, format is name header and two columns of info, for our example we use age + Hf, but any 2D data will work
-[numbers text1, data] = xlsread('/Users/kurtsundell/Desktop/Manuscript_v01/sensitivity_input1.xlsx');
+%[numbers text1, data] = xlsread('/Users/kurtsundell/Desktop/Manuscript_v01/sensitivity_input1.xlsx');
 
 AgeHf1 = numbers(:,1:2);
 AgeHf2 = numbers(:,3:4);
@@ -21,18 +21,18 @@ xint = 1; %interval for KDE
 x = xmin:xint:xmax;
 ymin = -41;
 ymax = 20;
-bandwidth_x = 20; % kernel bandwidth x (Myr)
-bandwidth_y = 1; % kernel bandwidth y (Epsilon units)
+bandwidth_x = 10; % kernel bandwidth x (Myr)
+bandwidth_y = 0.5; % kernel bandwidth y (Epsilon units)
 gridspc = 2^9; % resolution of bivariae KDEs (how many pixels), has to be in powers of 2, no need to go over go over 2^12
 
 interval = 100;
 
 for j = 1:15
 	
-	for k = 1:20
+	for k = 1:10
 		
 		F = datasample(AgeHf1,interval*j,'Replace',true);
-		G = datasample(AgeHf1,interval*j,'Replace',true);
+		G = datasample(AgeHf2,interval*j,'Replace',true);
 		
 		kde1 = kde(F(:,1),bandwidth_x.*ones(size(F(:,1))),xmin,xmax,xint); %make KDE
 		kde2 = kde(G(:,1),bandwidth_x.*ones(size(G(:,1))),xmin,xmax,xint); %make KDE
@@ -170,7 +170,7 @@ hold on
 
 plot(interval:interval:interval*max(j),median(R1D),'linewidth', 16,'color','g')
 plot([(interval:interval:interval*max(j)); (interval:interval:interval*max(j))], [(median(R1D)+std(R1D)); (median(R1D)-std(R1D))], 'Color', 'g', 'LineWidth',12) % Error bars
-scatter(interval:interval:interval*max(j),median(R1D),5000,'s','filled','markeredgecolor','k','markerfacecolor','g')
+scatter(interval:interval:interval*max(j),median(R1D),5000,'o','filled','markeredgecolor','k','markerfacecolor','g')
 
 plot(interval:interval:interval*max(j),median(L1D),'linewidth', 16,'color','m')
 plot([(interval:interval:interval*max(j)); (interval:interval:interval*max(j))], [(median(L1D)+std(L1D)); (median(L1D)-std(L1D))], 'Color', 'm', 'LineWidth',12) % Error bars
@@ -178,15 +178,15 @@ scatter(interval:interval:interval*max(j),median(L1D),5000,'s','filled','markere
 
 plot(interval:interval:interval*max(j),median(S1D),'linewidth', 16,'color','c')
 plot([(interval:interval:interval*max(j)); (interval:interval:interval*max(j))], [(median(S1D)+std(S1D)); (median(S1D)-std(S1D))], 'Color', 'c', 'LineWidth',12) % Error bars
-scatter(interval:interval:interval*max(j),median(S1D),5000,'s','filled','markeredgecolor','k','markerfacecolor','c')
+scatter(interval:interval:interval*max(j),median(S1D),5000,'^','filled','markeredgecolor','k','markerfacecolor','c')
 
 plot(interval:interval:interval*max(j),median(D1D),'linewidth', 16,'color','b')
 plot([(interval:interval:interval*max(j)); (interval:interval:interval*max(j))], [(median(D1D)+std(D1D)); (median(D1D)-std(D1D))], 'Color', 'b', 'LineWidth',12) % Error bars
-scatter(interval:interval:interval*max(j),median(D1D),5000,'s','filled','markeredgecolor','k','markerfacecolor','b')
+scatter(interval:interval:interval*max(j),median(D1D),5000,'d','filled','markeredgecolor','k','markerfacecolor','b')
 
 plot(interval:interval:interval*max(j),median(V1D),'linewidth', 16,'color','r')
 plot([(interval:interval:interval*max(j)); (interval:interval:interval*max(j))], [(median(V1D)+std(V1D)); (median(V1D)-std(V1D))], 'Color', 'r', 'LineWidth',12) % Error bars
-scatter(interval:interval:interval*max(j),median(V1D),5000,'s','filled','markeredgecolor','k','markerfacecolor','r')
+scatter(interval:interval:interval*max(j),median(V1D),5000,'v','filled','markeredgecolor','k','markerfacecolor','r')
 
 axis([0 interval*max(j)+interval 0 1])
 xlabel('n')
@@ -201,7 +201,7 @@ hold on
 
 plot(interval:interval:interval*max(j),median(R2D),'linewidth', 16,'color','g')
 plot([(interval:interval:interval*max(j)); (interval:interval:interval*max(j))], [(median(R2D)+std(R2D)); (median(R2D)-std(R2D))], 'Color', 'g', 'LineWidth',12) % Error bars
-scatter(interval:interval:interval*max(j),median(R2D),5000,'s','filled','markeredgecolor','k','markerfacecolor','g')
+scatter(interval:interval:interval*max(j),median(R2D),5000,'o','filled','markeredgecolor','k','markerfacecolor','g')
 
 plot(interval:interval:interval*max(j),median(L2D),'linewidth', 16,'color','m')
 plot([(interval:interval:interval*max(j)); (interval:interval:interval*max(j))], [(median(L2D)+std(L2D)); (median(L2D)-std(L2D))], 'Color', 'm', 'LineWidth',12) % Error bars
@@ -209,15 +209,15 @@ scatter(interval:interval:interval*max(j),median(L2D),5000,'s','filled','markere
 
 plot(interval:interval:interval*max(j),median(S2D),'linewidth', 16,'color','c')
 plot([(interval:interval:interval*max(j)); (interval:interval:interval*max(j))], [(median(S2D)+std(S2D)); (median(S2D)-std(S2D))], 'Color', 'c', 'LineWidth',12) % Error bars
-scatter(interval:interval:interval*max(j),median(S2D),5000,'s','filled','markeredgecolor','k','markerfacecolor','c')
+scatter(interval:interval:interval*max(j),median(S2D),5000,'^','filled','markeredgecolor','k','markerfacecolor','c')
 
 plot(interval:interval:interval*max(j),median(D2D),'linewidth', 16,'color','b')
 plot([(interval:interval:interval*max(j)); (interval:interval:interval*max(j))], [(median(D2D)+std(D2D)); (median(D2D)-std(D2D))], 'Color', 'b', 'LineWidth',12) % Error bars
-scatter(interval:interval:interval*max(j),median(D2D),5000,'s','filled','markeredgecolor','k','markerfacecolor','b')
+scatter(interval:interval:interval*max(j),median(D2D),5000,'d','filled','markeredgecolor','k','markerfacecolor','b')
 
 plot(interval:interval:interval*max(j),median(V2D),'linewidth', 16,'color','r')
 plot([(interval:interval:interval*max(j)); (interval:interval:interval*max(j))], [(median(V2D)+std(V2D)); (median(V2D)-std(V2D))], 'Color', 'r', 'LineWidth',12) % Error bars
-scatter(interval:interval:interval*max(j),median(V2D),5000,'s','filled','markeredgecolor','k','markerfacecolor','r')
+scatter(interval:interval:interval*max(j),median(V2D),5000,'v','filled','markeredgecolor','k','markerfacecolor','r')
 
 axis([0 interval*max(j)+interval 0 1])
 xlabel('n')
