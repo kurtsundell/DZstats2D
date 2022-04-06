@@ -535,6 +535,7 @@ for i = 1:N
 	end
 	box on
 	axis square
+	zlim([0 max(max(max(density1)))]);
 	
 	if get(H.plot_scat3,'Value') == 1
 		data2 = data1(:,i*2-1:i*2);
@@ -587,7 +588,6 @@ for i = 1:N
 	d.Message = 'Making plots! Please wait...';
 	
 end
-
 
 if get(H.syncax,'Value') == 1 %option to synchronize axes
 	Link = linkprop(ax,{'CameraUpVector', 'CameraPosition', 'CameraTarget', 'XLim', 'YLim', 'ZLim'});
